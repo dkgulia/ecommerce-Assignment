@@ -1,0 +1,41 @@
+version: '3'
+services:
+  db:
+    image: postgres
+    restart: always
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_DB=Ecommerce-Platform
+      - POSTGRES_USER=ecommerce
+      - POSTGRES_PASSWORD=1234
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    ports:
+      - 7070:7070
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgres://ecommerce:1234@db:5432/Ecommerce-Platform
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    ports:
+      - 3001:3000
+    depends_on:
+      - backend
+
+
