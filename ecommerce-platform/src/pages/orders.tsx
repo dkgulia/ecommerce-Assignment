@@ -1,13 +1,12 @@
+// src/pages/orders.tsx
 import { useState } from 'react';
-import { Container, Grid, Paper, Typography, TextField, Button, Divider, Box, Snackbar } from '@mui/material';
+import { Container, Grid, Paper, Typography, TextField, Button, Divider, Box } from '@mui/material';
 import { useRouter } from 'next/router';
 import { useCart } from '../component/cartContext';
-import { useAuth } from '../component/authContext';
 
 export default function OrdersPage() {
   const router = useRouter();
-  const { cartItems, clearCart } = useCart();
-  const { user } = useAuth(); // Assuming you have user info in auth context
+  const { cartItems, clearCart } = useCart(); // Added clearCart
   const [orderDetails, setOrderDetails] = useState({
     fullName: '',
     contact: '',
@@ -15,8 +14,9 @@ export default function OrdersPage() {
     nearby: '',
     pincode: '',
   });
-  const [successMessage, setSuccessMessage] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [orderSuccess, setOrderSuccess] = useState(false);
+
+  const totalAmount = cartItems.reduce((sum, item) => sum + item.price, 0);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setOrderDetails({
@@ -27,50 +27,35 @@ export default function OrdersPage() {
 
   const handleSubmit = async () => {
     try {
-      if (cartItems.length === 0) {
-        setErrorMessage('Cart is empty');
-        return;
-      }
-      if (!orderDetails.fullName || !orderDetails.contact || !orderDetails.address || !orderDetails.pincode) {
-        setErrorMessage('All shipping details must be filled out');
-        return;
-      }
-
-      // Send a POST request for each item in the cart
-      const orderPromises = cartItems.map(async (item) => {
+      for (const item of cartItems) {
         const response = await fetch('/orders', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            user_id: user?.id || 1,
+            user_id: 1, // Replace with actual user ID
             product_id: item.id,
-            quantity: 1, 
+            quantity: 1, // Assuming quantity is 1 per item
             total_price: item.price,
-            full_name: orderDetails.fullName,
-            contact: orderDetails.contact,
-            address: orderDetails.address,
-            nearby: orderDetails.nearby,
-            pincode: orderDetails.pincode,
           }),
         });
 
         if (!response.ok) {
           throw new Error('Failed to place order');
         }
-      });
+      }
 
-      await Promise.all(orderPromises);
+      setOrderSuccess(true); // Show success message
+      clearCart(); // Clear the cart
 
-      // Clear cart and show success message
-      clearCart();
-      setSuccessMessage('Order placed successfully');
       setTimeout(() => {
-        router.push('/products');
-      }, 2000); 
-
+        router.push('/'); // Redirect to home or another page after 2 seconds
+      }, 2000);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
-      setErrorMessage(errorMessage);
+      if (error instanceof Error) {
+        alert(error.message);
+      } else {
+        alert('An unknown error occurred.');
+      }
     }
   };
 
@@ -131,7 +116,7 @@ export default function OrdersPage() {
         </Grid>
 
         <Grid item xs={12} md={4}>
-          <Paper sx={{ p: 3 }}>
+          <Paper sx={{ p: 3, bgcolor: '#ffc300' }}>
             <Typography variant="h5" gutterBottom>
               Order Summary
             </Typography>
@@ -145,28 +130,29 @@ export default function OrdersPage() {
               </Box>
             ))}
             <Divider sx={{ mb: 2 }} />
-            <Button variant="contained" color="primary" fullWidth onClick={handleSubmit}>
-              Confirm Order
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+              <Typography variant="body1">Total:</Typography>
+              <Typography variant="body1" fontWeight="bold">
+                ${totalAmount.toFixed(2)}
+              </Typography>
+            </Box>
+            <Button
+              variant="contained"
+              color={orderSuccess ? 'success' : 'primary'}
+              fullWidth
+              onClick={handleSubmit}
+              sx={{
+                bgcolor: orderSuccess ? 'green' : undefined,
+                '&:hover': {
+                  bgcolor: orderSuccess ? 'darkgreen' : undefined,
+                },
+              }}
+            >
+              {orderSuccess ? 'Order Placed Successfully' : 'Confirm Order'}
             </Button>
           </Paper>
         </Grid>
       </Grid>
-
-      {/* Success Message Snackbar */}
-      <Snackbar
-        open={!!successMessage}
-        autoHideDuration={6000}
-        onClose={() => setSuccessMessage('')}
-        message={successMessage}
-      />
-
-      {/* Error Message Snackbar */}
-      <Snackbar
-        open={!!errorMessage}
-        autoHideDuration={6000}
-        onClose={() => setErrorMessage('')}
-        message={errorMessage}
-      />
     </Container>
   );
 }
