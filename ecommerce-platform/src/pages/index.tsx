@@ -59,7 +59,7 @@ const HomePage = () => {
   return (
     <Layout>
       <Typography variant="h4" component="h1" gutterBottom>
-        Welcome to My E-Commerce Site
+        {/* Welcome to My E-Commerce Site */}
       </Typography>
       <Grid container spacing={4}>
         {products.map((product) => (

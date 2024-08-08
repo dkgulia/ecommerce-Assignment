@@ -1,5 +1,5 @@
 // components/ProductCard.tsx
-import { Card, CardActionArea, CardContent, CardMedia, Typography, CardActions, Button } from '@mui/material';
+import { Card, CardActionArea, CardContent, CardMedia, Typography, CardActions, Button, Rating } from '@mui/material';
 import { useRouter } from 'next/router';
 import { useAuth } from '../component/authContext';
 import { useCart } from '../component/cartContext';
@@ -25,8 +25,10 @@ const ProductCard = ({ id, name, description, price, imageUrl }: ProductCardProp
     }
   };
 
+  const dummyStock = 10; // Dummy stock number
+
   return (
-    <Card sx={{ maxWidth: 345 }}>
+    <Card sx={{ width: 345, height: 420 }}> {/* Adjusted height to accommodate stock information */}
       <CardActionArea>
         <CardMedia component="img" height="140" image={imageUrl} alt={name} />
         <CardContent>
@@ -36,6 +38,10 @@ const ProductCard = ({ id, name, description, price, imageUrl }: ProductCardProp
           <Typography variant="body2" color="text.secondary">
             {description}
           </Typography>
+          <Rating name="read-only" value={4} readOnly sx={{ mt: 1 }} /> {/* Dummy rating */}
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+            {dummyStock} items left in stock
+          </Typography> {/* Stock information */}
         </CardContent>
       </CardActionArea>
       <CardActions>

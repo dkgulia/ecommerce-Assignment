@@ -1,6 +1,18 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { getClient } from '../database/conn';
 
+
+interface ProductRequestBody {
+    name: string;
+    description: string;
+    price: number;
+    category: string;
+    stock: number;
+    rating: number;
+    imageUrl: string; 
+  }
+
+
 export async function getProducts(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const client = await getClient();
     try {
@@ -20,13 +32,13 @@ export async function getProducts(request: FastifyRequest, reply: FastifyReply):
 
 export async function createProduct(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const client = await getClient();
-    const { name, description, price, category, stock, rating } = request.body as { 
-        name: string; description: string; price: number; category: string; stock: number; rating: number; 
+    const { name, description, price, category, stock, rating, imageUrl } = request.body as { 
+        name: string; description: string; price: number; category: string; stock: number; rating: number; imageUrl: string;
     };
     try {
         await client.query(
-            'INSERT INTO product (name, description, price, category, stock, rating) VALUES ($1, $2, $3, $4, $5, $6)',
-            [name, description, price, category, stock, rating]
+            'INSERT INTO product (name, description, price, category, stock, rating, imageUrl) VALUES ($1, $2, $3, $4, $5, $6, $7)',
+            [name, description, price, category, stock, rating, imageUrl]
         );
         reply.code(201).send({ message: 'Product created successfully' });
     } catch (err) {
@@ -36,6 +48,8 @@ export async function createProduct(request: FastifyRequest, reply: FastifyReply
         client.release();
     }
 }
+
+
 
 export async function updateProduct(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const client = await getClient();

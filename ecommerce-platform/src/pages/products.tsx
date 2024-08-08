@@ -59,7 +59,7 @@ const ProductsPage = () => {
   return (
     <Layout>
       <Typography variant="h4" component="h1" gutterBottom>
-        Products
+        {/* Products */}
       </Typography>
       <Grid container spacing={4}>
         {products.map((product) => (

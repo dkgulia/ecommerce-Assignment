@@ -29,11 +29,13 @@ const Layout = ({ children }: LayoutProps) => {
               <Link href="/products" style={{ textDecoration: 'none', color: 'inherit' }}>
                 <Button color="inherit">Products</Button>
               </Link>
-              <IconButton color="inherit">
-                <Badge badgeContent={cartItems.length} color="secondary">
-                  <ShoppingCartIcon />
-                </Badge>
-              </IconButton>
+              <Link href="/cart" style={{ textDecoration: 'none', color: 'inherit' }}>
+                <IconButton color="inherit">
+                  <Badge badgeContent={cartItems.length} color="secondary">
+                    <ShoppingCartIcon />
+                  </Badge>
+                </IconButton>
+              </Link>
               <Button color="inherit" onClick={logout}>Logout</Button>
             </>
           ) : (
