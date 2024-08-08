@@ -1,4 +1,5 @@
 Introduction
+
 This project is an eCommerce platform built using modern web technologies like Next.js for the frontend, Fastify for the backend, and PostgreSQL for the database. The application allows users to browse products, add them to the cart, and place orders. The platform also includes user authentication, product management, and order place features.
 
 Features
